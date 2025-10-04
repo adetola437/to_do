@@ -1,0 +1,6 @@
+{
+    "yaml.schemas": {
+        "file:///Users/abdulmajeedoduyomi/.vscode/extensions/atlassian.atlascode-3.8.20/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml",
+        "https://www.schemastore.org/pubspec.json": "file:///Users/abdulmajeedoduyomi/Documents/mobile/to_do/pubspec.yaml"
+    }
+}
