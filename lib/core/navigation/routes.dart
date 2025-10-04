@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:to_do/features/home/presentation/controllers/create_task.dart';
+import 'package:to_do/features/home/presentation/controllers/view_note.dart';
 
 
 import '../data/model/note.dart';
@@ -24,6 +25,13 @@ GoRouter router = GoRouter(
       GoRoute(
       path: CreateTaskScreen.route,
       pageBuilder: (context, state) => buildPage( CreateTaskScreen(note: state.extra as Note,)),
+      routes: [
+   
+      ]
+    ),
+       GoRoute(
+      path: ViewNoteScreen.route,
+      pageBuilder: (context, state) => buildPage( ViewNoteScreen(note: state.extra as Note,)),
       routes: [
    
       ]

@@ -1,16 +1,23 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:to_do/core/theme/theme.dart';
+import 'package:to_do/core/utils/extensions.dart';
 import 'package:to_do/features/home/presentation/bloc/category/category_cubit.dart';
+import 'package:to_do/features/home/presentation/bloc/theme/theme_bloc.dart';
 import 'package:to_do/features/home/presentation/controllers/create_task.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:to_do/features/home/presentation/controllers/view_note.dart';
+import 'package:to_do/main.dart';
 
 
 
@@ -154,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen>
   
   @override
   void viewNote(Note note) {
-    context.push(CreateTaskScreen.route, extra: note);
+    context.push(ViewNoteScreen.route, extra: note);
   }
 
 @override

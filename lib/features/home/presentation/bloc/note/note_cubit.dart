@@ -21,6 +21,7 @@ class NoteCubit extends Cubit<NoteState> {
 
     } catch (e) {
       emit(NoteCreateError());
+          loadNotes();
     }
   
   }
@@ -29,11 +30,12 @@ class NoteCubit extends Cubit<NoteState> {
     try {
         emit(NoteCreateLoading());
    await repository.deleteNote(noteId);
-   emit(NoteCreateSuccess());
+   emit(NoteDeleteSuccess());
    loadNotes();
 
     } catch (e) {
-      emit(NoteCreateError());}
+      emit(NoteDeleteError());}
+      loadNotes();
   }
 
 

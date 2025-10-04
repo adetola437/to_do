@@ -10,17 +10,32 @@ class HomeView extends StatelessWidget implements HomeViewContract {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       body: BlocListener<NoteCubit, NoteState>(
         listener: (context, state) {
           if (state is NotesLoaded) {
             controller.setNotes(state.notes);
           }
+          if (state is NoteDeleteSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Note deleted successfully'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+          if (state is NoteDeleteError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('An error occured deleting note'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
           // TODO: implement listener
         },
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding:REdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -28,17 +43,33 @@ class HomeView extends StatelessWidget implements HomeViewContract {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'My Note',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    'My Note'.toText(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
-                    IconButton(icon: Icon(Icons.more_vert), onPressed: () {}),
+                    ValueListenableBuilder(
+                      valueListenable: themeNotifier,
+                      builder: (context, value, child) {
+                        log(value.brightness.toString(  ));
+                         final isDark = value == darkTheme;
+                        return Transform.scale(
+                            scale: 0.6.sp,
+                            child: Switch(
+                              value: isDark,
+                              onChanged: (newValue) async {
+                                context.read<ThemeBloc>().add(ThemeToggleEvent()
+                                      );
+                              },
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                            ),
+                          );
+                      },
+                      
+                    )
                   ],
                 ),
-                SizedBox(height: 16),
+               16.verticalSpace,
 
                 // Search bar
                 TextField(
@@ -57,11 +88,11 @@ class HomeView extends StatelessWidget implements HomeViewContract {
                     controller.debounceSearch(value);
                   },
                 ),
-                SizedBox(height: 16),
+            16.verticalSpace,
 
                 // Date selector
                 SizedBox(
-                  height: 80,
+                  height: 80.h,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: 7,
@@ -73,49 +104,60 @@ class HomeView extends StatelessWidget implements HomeViewContract {
                     },
                   ),
                 ),
-                SizedBox(height: 16),
+                 16.verticalSpace,
 
                 // Category filters
                 SizedBox(
-                  height: 50,
+                  height: 50.h,
                   child: BlocBuilder<CategoryCubit, CategoryState>(
                     builder: (context, state) {
                       if (state is CategoryLoading) {
                         return Center(child: CircularProgressIndicator());
                       }
                       if (state is CategoryLoaded) {
- return
- state.categories.isEmpty ?
- Center(
-  child: Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text('No Cateroies Found'),
-      IconButton(onPressed: (){
-         GeneralUtils().showAddCategoryDialog(() async {
-                              // context.read<CategoryCubit>().getCategories();
-                              // showSaveNoteModal(context, note);
-                            }, context);
-      }, icon: Icon(Icons.add))
-    ],
-  ),
- ) :
-  ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: state.categories.length,
-                        itemBuilder: (context, index) {
-                          final category = state.categories[index];
-                          final isSelected =
-                              category.name.toLowerCase() == controller.selectedCategory!.toLowerCase();
-                          return _buildCategoryChip(category, isSelected);
-                        },
-                      );
+                        return state.categories.isEmpty
+                            ? Center(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('No Cateroies Found'),
+                                    IconButton(
+                                      onPressed: () {
+                                        GeneralUtils().showAddCategoryDialog(
+                                          () async {
+                                            // context.read<CategoryCubit>().getCategories();
+                                            // showSaveNoteModal(context, note);
+                                          },
+                                          context,
+                                        );
+                                      },
+                                      icon: Icon(Icons.add),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: state.categories.length,
+                                itemBuilder: (context, index) {
+                                  final category = state.categories[index];
+                                  final isSelected =
+                                      category.name.toLowerCase() ==
+                                      controller.selectedCategory!
+                                          .toLowerCase();
+                                  return _buildCategoryChip(
+                                    category,
+                                    isSelected,
+                                  );
+                                },
+                              );
                       }
-                     return Center(child: Text('No Categories Found'));
+                      return Center(child: 'No Categories Found'.toText());
                     },
                   ),
                 ),
-                SizedBox(height: 16),
+                16.verticalSpace,
 
                 // Notes grid
                 BlocBuilder<NoteCubit, NoteState>(
@@ -124,31 +166,27 @@ class HomeView extends StatelessWidget implements HomeViewContract {
                       return Center(child: CircularProgressIndicator());
                     }
                     if (state is NotesLoaded) {
-                      return 
-                      Expanded(
-                        child: 
-                        state.notes.isEmpty ?
-                        Center(
-                          child: Text("No Notes Found")
-                        ):
-                        GridView.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: 0.85,
+                      return Expanded(
+                        child: state.notes.isEmpty
+                            ? Center(child: "No Notes Found".toText())
+                            : GridView.builder(
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 12,
+                                      mainAxisSpacing: 12,
+                                      childAspectRatio: 0.85,
+                                    ),
+                                itemCount: state.notes.length,
+                                itemBuilder: (context, index) {
+                                  return _buildNoteCard(state.notes[index], context);
+                                },
                               ),
-                          itemCount: state.notes.length,
-                          itemBuilder: (context, index) {
-                            return _buildNoteCard(state.notes[index]);
-                          },
-                        ),
                       );
                     }
 
                     return Expanded(
-                      child: Center(child: Text('No notes found')),
+                      child: Center(child: 'No notes found'.toText()),
                     );
                   },
                 ),
@@ -167,14 +205,14 @@ class HomeView extends StatelessWidget implements HomeViewContract {
     );
   }
 
-  Widget _buildDateChip(DateTime date, bool isSelected) {
+  Widget _buildDateChip(DateTime date, bool isSelected,) {
     final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     return Container(
-      width: 70,
-      margin: EdgeInsets.only(right: 8),
+      width: 70.h,
+      margin: REdgeInsets.only(right: 8),
       decoration: BoxDecoration(
         color: isSelected ? Colors.grey.shade800 : Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -186,7 +224,7 @@ class HomeView extends StatelessWidget implements HomeViewContract {
               fontSize: 12,
             ),
           ),
-          SizedBox(height: 4),
+         4.verticalSpace,
           Text(
             '${date.day}',
             style: TextStyle(
@@ -206,11 +244,11 @@ class HomeView extends StatelessWidget implements HomeViewContract {
         controller.setCategory(category);
       },
       child: Container(
-        margin: EdgeInsets.only(right: 8),
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: REdgeInsets.only(right: 8),
+        padding:REdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected ? Colors.grey.shade800 : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Text(
           category.name,
@@ -223,7 +261,7 @@ class HomeView extends StatelessWidget implements HomeViewContract {
     );
   }
 
-  Widget _buildNoteCard(Note note) {
+  Widget _buildNoteCard(Note note, BuildContext context) {
     return GestureDetector(
       onTap: () {
         controller.viewNote(note);
@@ -232,7 +270,7 @@ class HomeView extends StatelessWidget implements HomeViewContract {
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: note.color,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16.r),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,7 +281,7 @@ class HomeView extends StatelessWidget implements HomeViewContract {
                 Expanded(
                   child: Text(
                     note.title ?? '',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: context.designSystem.text ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -266,9 +304,10 @@ class HomeView extends StatelessWidget implements HomeViewContract {
             Expanded(
               child: Text(
                 controller.getPlainTextFromQuill(note.quillContent ?? ''),
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(fontSize: 14, color: context.designSystem.text),
                 maxLines: 6,
                 overflow: TextOverflow.ellipsis,
+
               ),
             ),
           ],

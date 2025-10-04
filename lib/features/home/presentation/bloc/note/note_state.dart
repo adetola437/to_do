@@ -35,5 +35,8 @@ final class NoteError extends NoteState {
   List<Object> get props => [message];
 }
 
+final class NoteDeleteSuccess extends NoteState {}final class NoteDeleteError extends NoteState {}
+
+
 
 

@@ -1,9 +1,12 @@
-part of '../controllers/withdraw.dart';
+part of '../controllers/view_note.dart';
 
-abstract class WithdrawControllerContract {
+abstract class ViewNoteControllerContract {
+ Note? note;
+    QuillController? controller;
 
+  void edit() {}
 }
 
-abstract class WithdrawViewContract extends BaseViewContract {
+abstract class ViewNoteViewContract extends BaseViewContract {
 
 }

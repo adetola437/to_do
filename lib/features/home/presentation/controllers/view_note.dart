@@ -7,8 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:to_do/core/utils/extensions.dart';
+import 'package:to_do/core/utils/notes_service.dart';
+import 'package:to_do/core/utils/toast.dart';
 import 'package:to_do/features/home/presentation/bloc/note/note_cubit.dart';
 
 

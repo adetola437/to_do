@@ -11,6 +11,12 @@ class CreateTaskView extends StatelessWidget implements CreateTaskViewContract {
       body: BlocListener<NoteCubit, NoteState>(
         listener: (context, state) {
           if (state is NoteCreateSuccess) {
+             ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content:
+              controller.isEdit! ?
+              Text('Note Updated successfully'):
+               Text('Note Created successfully'), backgroundColor: Colors.green,),
+           );
             Navigator.pop(context);
             Navigator.pop(context);
           }
