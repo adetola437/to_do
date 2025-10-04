@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
@@ -5,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:to_do/features/home/presentation/bloc/category/category_cubit.dart';
 import 'package:to_do/features/home/presentation/controllers/create_task.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 
@@ -14,6 +17,7 @@ import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 import '../../../../core/data/model/note.dart';
 import '../../../../core/data/model/note_category.dart';
+import '../../../../core/utils/function.dart';
 import '../bloc/note/note_cubit.dart';
 import '/core/utils/contracts.dart';
 
@@ -44,7 +48,17 @@ class _HomeScreenState extends State<HomeScreen>
       controller: this,
     );
     loadNotes();
+       debounceSearch = debounce((query) {
+      setState(() {
+        performSearch(query);
+      });
+    }, 500);
   }
+
+  performSearch(String query) {
+    context.read<NoteCubit>().loadNotes(query: query, category: selectedCategory);
+  }
+
 
 
 
@@ -55,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen>
   
   @override
   void createTask() {
-  context.push(CreateTaskScreen.route);
+  context.push(CreateTaskScreen.route,extra: Note());
   }
   @override
     List<Note>? notes = [];
@@ -103,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   loadNotes(){
     context.read<NoteCubit>().loadNotes();
+    context.read<CategoryCubit>().getCategories();
   }
 
 
@@ -134,12 +149,12 @@ class _HomeScreenState extends State<HomeScreen>
   setState(() {
     selectedCategory = category.name;
   });
- 
+ context.read<NoteCubit>().loadNotes(category: category.name);
   }
   
   @override
   void viewNote(Note note) {
-    // TODO: implement viewNote
+    context.push(CreateTaskScreen.route, extra: note);
   }
 
 @override
@@ -154,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen>
     // Filter by search
     if (searchController!.text.isNotEmpty) {
       filtered = filtered!
-          .where((n) => n.title
+          .where((n) => n.title!
               .toLowerCase()
               .contains(searchController!.text.toLowerCase()))
           .toList();
@@ -168,6 +183,21 @@ class _HomeScreenState extends State<HomeScreen>
   setState(() {
     notes = newNotes;
   });
+  }
+
+    @override
+  late Function debounceSearch;
+
+    Function debounce(Function func, int milliseconds) {
+    Timer? timer;
+    return (dynamic value) {
+      if (timer != null) {
+        timer!.cancel();
+      }
+      timer = Timer(Duration(milliseconds: milliseconds), () {
+        func(value);
+      });
+    };
   }
 
 }

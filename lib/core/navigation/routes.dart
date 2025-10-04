@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:to_do/features/home/presentation/controllers/create_task.dart';
 
 
+import '../data/model/note.dart';
 import '/config/di/app_initializer.dart';
 import '/features/home/presentation/presentation.dart';
 
@@ -22,7 +23,7 @@ GoRouter router = GoRouter(
     ),
       GoRoute(
       path: CreateTaskScreen.route,
-      pageBuilder: (context, state) => buildPage(const CreateTaskScreen()),
+      pageBuilder: (context, state) => buildPage( CreateTaskScreen(note: state.extra as Note,)),
       routes: [
    
       ]

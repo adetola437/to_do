@@ -54,7 +54,7 @@ class HomeView extends StatelessWidget implements HomeViewContract {
                     ),
                   ),
                   onChanged: (value) {
-                    controller.onChangedValue(value);
+                    controller.debounceSearch(value);
                   },
                 ),
                 SizedBox(height: 16),
@@ -78,14 +78,40 @@ class HomeView extends StatelessWidget implements HomeViewContract {
                 // Category filters
                 SizedBox(
                   height: 50,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: controller.defaultCategories!.length,
-                    itemBuilder: (context, index) {
-                      final category = controller.defaultCategories![index];
-                      final isSelected =
-                          category.name == controller.selectedCategory;
-                      return _buildCategoryChip(category, isSelected);
+                  child: BlocBuilder<CategoryCubit, CategoryState>(
+                    builder: (context, state) {
+                      if (state is CategoryLoading) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      if (state is CategoryLoaded) {
+ return
+ state.categories.isEmpty ?
+ Center(
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: [
+      Text('No Cateroies Found'),
+      IconButton(onPressed: (){
+         GeneralUtils().showAddCategoryDialog(() async {
+                              // context.read<CategoryCubit>().getCategories();
+                              // showSaveNoteModal(context, note);
+                            }, context);
+      }, icon: Icon(Icons.add))
+    ],
+  ),
+ ) :
+  ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: state.categories.length,
+                        itemBuilder: (context, index) {
+                          final category = state.categories[index];
+                          final isSelected =
+                              category.name.toLowerCase() == controller.selectedCategory!.toLowerCase();
+                          return _buildCategoryChip(category, isSelected);
+                        },
+                      );
+                      }
+                     return Center(child: Text('No Categories Found'));
                     },
                   ),
                 ),
@@ -97,28 +123,33 @@ class HomeView extends StatelessWidget implements HomeViewContract {
                     if (state is FetchingNotes) {
                       return Center(child: CircularProgressIndicator());
                     }
-                     if (state is NotesLoaded){
-  return Expanded(
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.85,
+                    if (state is NotesLoaded) {
+                      return 
+                      Expanded(
+                        child: 
+                        state.notes.isEmpty ?
+                        Center(
+                          child: Text("No Notes Found")
+                        ):
+                        GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 0.85,
+                              ),
+                          itemCount: state.notes.length,
+                          itemBuilder: (context, index) {
+                            return _buildNoteCard(state.notes[index]);
+                          },
                         ),
-                        itemCount: state.notes.length,
-                        itemBuilder: (context, index) {
-                          return _buildNoteCard(
-                           state.notes[index],
-                          );
-                        },
-                      ),
+                      );
+                    }
+
+                    return Expanded(
+                      child: Center(child: Text('No notes found')),
                     );
-                     }
-                   
-                  return Expanded(child: Center(
-                    child:
-                    Text('No notes found')));
                   },
                 ),
               ],
@@ -211,19 +242,30 @@ class HomeView extends StatelessWidget implements HomeViewContract {
               children: [
                 Expanded(
                   child: Text(
-                    note.title,
+                    note.title ?? '',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Icon(Icons.edit, size: 20, color: Colors.grey.shade700),
+                IconButton(
+                  icon: Icon(
+                    Icons.delete,
+                    size: 20,
+                    color: Colors.grey.shade700,
+                  ),
+                  onPressed: () {
+                    if (note.id != null && note.id!.isNotEmpty) {
+                      GetIt.I.get<NoteCubit>().deleteNote(note.id ?? '');
+                    }
+                  },
+                ),
               ],
             ),
             SizedBox(height: 12),
             Expanded(
               child: Text(
-                controller.getPlainTextFromQuill(note.quillContent),
+                controller.getPlainTextFromQuill(note.quillContent ?? ''),
                 style: TextStyle(fontSize: 14),
                 maxLines: 6,
                 overflow: TextOverflow.ellipsis,

@@ -1,22 +1,22 @@
 import 'dart:ui';
 
 class Note {
-  final String id;
-  final String title;
-  final String category;
-  final String quillContent; // JSON string of Quill document
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final Color color;
+   String? id;
+   String? title;
+   String? category;
+   String? quillContent; // JSON string of Quill document
+   DateTime? createdAt;
+   DateTime? updatedAt;
+   Color? color;
 
   Note({
-    required this.id,
-    required this.title,
-    required this.category,
-    required this.quillContent,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.color,
+     this.id,
+     this.title,
+     this.category,
+     this.quillContent,
+     this.createdAt,
+     this.updatedAt,
+     this.color,
   });
 
   Map<String, dynamic> toJson() {
@@ -25,9 +25,9 @@ class Note {
       'title': title,
       'category': category,
       'quillContent': quillContent,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'color': color.value,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+      'color': color?.value,
     };
   }
 

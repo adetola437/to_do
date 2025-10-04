@@ -19,6 +19,8 @@ abstract class HomeControllerContract {
 
   void setNotes(List<Note> notes);
 
+    late Function debounceSearch;
+
 
 }
 

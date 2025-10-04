@@ -26,12 +26,14 @@ class CreateTaskView extends StatelessWidget implements CreateTaskViewContract {
                     QuillToolbarCustomButtonOptions(
                       icon: const Icon(Icons.save),
                       onPressed: () {
+                        Note? note= controller.note ?? Note();
+                        note.quillContent =  jsonEncode(
+                            controller.controller!.document.toDelta().toJson(),
+                          );
                         context.read<CategoryCubit>().getCategories();
                         showSaveNoteModal(
-                          context,
-                          jsonEncode(
-                            controller.controller!.document.toDelta().toJson(),
-                          ),
+                          context,note
+                         
                         );
                       },
                     ),
@@ -59,12 +61,19 @@ class CreateTaskView extends StatelessWidget implements CreateTaskViewContract {
     );
   }
 
-  void showSaveNoteModal(BuildContext context, String quillNote) {
+  void showSaveNoteModal(BuildContext context, Note quillNote) {
+   
     final titleController = TextEditingController();
     String? selectedCategory;
     Color selectedColor = Colors.lightBlue.shade100;
     final formKey = GlobalKey<FormState>();
-
+ if (quillNote.quillContent!.isNotEmpty ) {
+  log(quillNote.quillContent ?? '');
+      titleController.text = quillNote.title ?? '';
+      selectedCategory = quillNote.category;
+      selectedColor = quillNote.color ??  Colors.lightBlue.shade100;
+      
+    }
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -306,22 +315,22 @@ class CreateTaskView extends StatelessWidget implements CreateTaskViewContract {
                           return ElevatedButton(
                             onPressed: () {
                               if(formKey.currentState!.validate()){
-  print('in here');
+
                               if (titleController.text.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text('Please enter a title')),
                                 );
                                 return;
                               }
-                              print('in here ');
+                            
           
                               final note = Note(
-                                id: DateTime.now().millisecondsSinceEpoch
+                                id: quillNote.id ?? DateTime.now().millisecondsSinceEpoch
                                     .toString(),
                                 title: titleController.text,
                                 category: selectedCategory ?? 'All',
-                                quillContent: quillNote,
-                                createdAt: DateTime.now(),
+                                quillContent: quillNote.quillContent,
+                                createdAt:quillNote.createdAt ?? DateTime.now(),
                                 updatedAt: DateTime.now(),
                                 color: selectedColor,
                               );

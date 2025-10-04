@@ -19,7 +19,9 @@ part '../views/create_task.dart';
 
 class CreateTaskScreen extends StatefulWidget {
   static const route = '/createTask';
-  const CreateTaskScreen({super.key});
+  const CreateTaskScreen({super.key, required this.note});
+
+  final Note note;
 
   @override
   State<CreateTaskScreen> createState() => _CreateTaskScreenState();
@@ -33,11 +35,22 @@ class _CreateTaskScreenState extends State<CreateTaskScreen>
   void initState() {
     super.initState();
      controller!.readOnly = false;
+
     view = CreateTaskView(
       controller: this,
     );
+         checkEdit();
    
+  }
 
+  checkEdit()async{
+    if(widget.note.id != null && widget.note.id!.isNotEmpty){
+      setState(() {
+        controller!.document = Document.fromJson(jsonDecode(widget.note.quillContent ?? ''));
+        isEdit = true;
+        note = widget.note;
+      });
+      }
   }
 
 
@@ -57,7 +70,12 @@ void dispose() {
 }
 
 @override
-  QuillController? controller = QuillController.basic(
-    
+  QuillController? controller = QuillController.basic( 
   );
+  
+  @override
+  bool? isEdit = false;
+  
+  @override
+  Note? note;
 }
