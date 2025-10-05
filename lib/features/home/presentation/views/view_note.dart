@@ -11,9 +11,7 @@ class ViewNoteView extends StatelessWidget implements ViewNoteViewContract {
       body: BlocListener<NoteCubit, NoteState>(
         listener: (context, state) {
           if(state is NoteDeleteSuccess){
-           ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Note deleted successfully'), backgroundColor: Colors.green,),
-           );
+         
             context.pop();
             
           }

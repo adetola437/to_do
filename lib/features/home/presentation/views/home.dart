@@ -121,7 +121,7 @@ class HomeView extends StatelessWidget implements HomeViewContract {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text('No Cateroies Found'),
+                                'No Categories Found'.toText(color: context.designSystem.text),
                                     IconButton(
                                       onPressed: () {
                                         GeneralUtils().showAddCategoryDialog(
@@ -132,7 +132,7 @@ class HomeView extends StatelessWidget implements HomeViewContract {
                                           context,
                                         );
                                       },
-                                      icon: Icon(Icons.add),
+                                      icon: Icon(Icons.add, color: context.designSystem.text,),
                                     ),
                                   ],
                                 ),
@@ -153,7 +153,7 @@ class HomeView extends StatelessWidget implements HomeViewContract {
                                 },
                               );
                       }
-                      return Center(child: 'No Categories Found'.toText());
+                      return Center(child: 'No Categories Found'.toText(color: context.designSystem.text));
                     },
                   ),
                 ),
